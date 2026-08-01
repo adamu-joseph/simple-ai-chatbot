@@ -52,8 +52,12 @@ venv\Scripts\activate
 python3 -m venv venv
 
 source venv/bin/activate
-```
 
+## or conda
+conda create -n <name> python=3.12
+
+conda activate <name>
+```
 ---
 
 ## Install Dependencies
@@ -69,7 +73,7 @@ pip install -r requirements.txt
 Create a `.env` file from `.env.example`.
 
 ```
-GEMINI_API_KEY=YOUR_API_KEY
+GOOGLE_GEMINI_API_KEY=YOUR_API_KEY
 ```
 
 ---
@@ -174,7 +178,6 @@ with your deployed backend URL.
 Deploy the `backend` folder to:
 
 - Render
-- Railway
 
 Build Command
 
@@ -218,6 +221,7 @@ No server is required.
 
 ## Future Improvements
 
+- Improved security through code review
 - CI/CD pipeline 
 - Streaming AI responses
 - Markdown rendering

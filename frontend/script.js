@@ -4,7 +4,7 @@
 // ===============================
 
 // Change this after deploying your Flask backend
-const API_URL = "https://your-api.onrender.com/chat";
+const API_URL = "https://simple-ai-chatbot-api.onrender.com/chat";
 
 const chatBox = document.getElementById("chatBox");
 const userInput = document.getElementById("userInput");

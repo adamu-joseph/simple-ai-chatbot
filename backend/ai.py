@@ -82,4 +82,11 @@ def generate_response(history: list) -> str:
     except Exception as e:
 
         print(f"Error while generating response: {e}")
+
+        if "429" in str(e):
+            return (
+                "⚠️ The AI service is temporarily busy or the free usage limit "
+                "has been reached. Please wait a few seconds and try again."
+            )
+
         return "Sorry, an error occurred while contacting the AI service."

@@ -35,7 +35,7 @@ def generate_response(user_message: str) -> str:
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=f"{SYSTEM_PROMPT}\n\nUser: {user_message}"
+            contents=f"{SYSTEM_PROMPT}\n\nUser: {user_message}",
         )
 
         if response.text:
@@ -44,5 +44,6 @@ def generate_response(user_message: str) -> str:
         return "Sorry, I couldn't generate a response."
 
     except Exception as e:
-        print(e)
-        return "Sorry, an error occurred while contacting the AI service."
+
+        return str(e)
+        # return "Sorry, an error occurred while contacting the AI service."

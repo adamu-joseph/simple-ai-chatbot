@@ -27,15 +27,51 @@ Your rules:
 """
 
 
-def generate_response(user_message: str) -> str:
+def build_conversation(history: list) -> str:
+    """
+    Builds a conversation string from the history list.
+    Each entry in history is a dict with 'role' and 'content'.
+    """
+
+    conversation = ""
+
+    for message in history:
+        role = message.get("role")
+        text = message.get("text", "").strip()
+
+        if not text:
+            continue
+
+        if role == "user":
+            conversation += f"User: {text}\n"
+
+        elif role == "assistant":
+            conversation += f"Assistant: {text}\n"
+
+    return conversation.strip()
+
+
+def generate_response(history: list) -> str:
     """
     Sends a message to Gemini and returns the response.
+    """
+
+    conversation = build_conversation(history)
+
+    prompt = f"""
+    {SYSTEM_PROMPT}
+
+    Conversation:
+
+    {conversation}
+
+    Assistant:
     """
 
     try:
         response = client.models.generate_content(
             model="gemini-3.6-flash",
-            contents=f"{SYSTEM_PROMPT}\n\nUser: {user_message}",
+            contents=prompt,
         )
 
         if response.text:
@@ -45,5 +81,5 @@ def generate_response(user_message: str) -> str:
 
     except Exception as e:
 
-        return str(e)
-        # return "Sorry, an error occurred while contacting the AI service."
+        print(f"Error while generating response: {e}")
+        return "Sorry, an error occurred while contacting the AI service."

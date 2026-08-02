@@ -13,16 +13,37 @@ const clearBtn = document.getElementById("clearBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 
 // ===============================
+// Conversation Memory
+// ===============================
+
+let conversation = [];
+
+// Maximum number of messages (user + assistant)
+const MAX_MESSAGES = 40;
+
+// ===============================
 // Load Previous Chat
 // ===============================
 
 window.onload = () => {
-    const history = localStorage.getItem("chatHistory");
 
-    if (history) {
-        chatBox.innerHTML = history;
-        scrollToBottom();
-    }
+    const history = localStorage.getItem("conversationHistory");
+
+    if (!history) return;
+
+    conversation = JSON.parse(history);
+
+    conversation.forEach(message => {
+
+        renderMessage(
+
+            message.role === "user" ? "user" : "bot",
+            message.text
+
+        );
+
+    });
+
 };
 
 // ===============================
@@ -30,7 +51,12 @@ window.onload = () => {
 // ===============================
 
 function saveChat() {
-    localStorage.setItem("chatHistory", chatBox.innerHTML);
+
+    localStorage.setItem(
+        "conversationHistory",
+        JSON.stringify(conversation)
+    );
+
 }
 
 // ===============================
@@ -39,30 +65,6 @@ function saveChat() {
 
 function scrollToBottom() {
     chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// ===============================
-// Add Message
-// ===============================
-
-function addMessage(sender, text) {
-
-    const message = document.createElement("div");
-    message.className = `message ${sender}`;
-
-    const avatar = sender === "user" ? "👤" : "🤖";
-
-    message.innerHTML = `
-        <div class="avatar">${avatar}</div>
-        <div class="bubble"></div>
-    `;
-
-    message.querySelector(".bubble").textContent = text;
-
-    chatBox.appendChild(message);
-
-    scrollToBottom();
-    saveChat();
 }
 
 // ===============================
@@ -79,6 +81,81 @@ function hideTyping() {
 }
 
 // ===============================
+// Add Message
+// ===============================
+
+function renderMessage(sender, text) {
+
+    const message = document.createElement("div");
+    message.className = `message ${sender}`;
+
+    const avatar = sender === "user" ? "👤" : "🤖";
+
+    message.innerHTML = `
+        <div class="avatar">${avatar}</div>
+        <div class="bubble"></div>
+    `;
+
+    message.querySelector(".bubble").textContent = text;
+
+    chatBox.appendChild(message);
+
+    scrollToBottom();
+
+}
+
+function addMessage(sender, text) {
+
+    conversation.push({
+
+        role: sender === "user" ? "user" : "assistant",
+        text: text
+
+    });
+
+    renderMessage(sender, text);
+
+    saveChat();
+
+}
+
+// ===============================
+// Start New Conversation
+// ===============================  
+
+function startNewConversation() {
+
+    // Clear conversation memory
+    conversation = [];
+
+    saveChat();
+
+    // Clear chat window
+    chatBox.innerHTML = "";
+
+    // Display system message
+    renderMessage(
+        "bot",
+        "🆕 A new conversation has started to maintain performance.\n\nHow can I help you today?"
+    );
+
+}
+
+// ===============================
+// Check Conversation Limit
+// ===============================
+
+function checkConversationLimit() {
+
+    if (conversation.length >= MAX_MESSAGES) {
+
+        startNewConversation();
+
+    }
+
+}
+
+// ===============================
 // Send Message
 // ===============================
 
@@ -87,6 +164,9 @@ async function sendMessage() {
     const message = userInput.value.trim();
 
     if (!message) return;
+
+    // Start a new conversation if the limit has been reached
+    checkConversationLimit();
 
     addMessage("user", message);
 
@@ -106,7 +186,7 @@ async function sendMessage() {
             },
 
             body: JSON.stringify({
-                message: message
+                history: conversation
             })
 
         });
@@ -180,7 +260,7 @@ clearBtn.addEventListener("click", () => {
 
     if(confirm("Clear all chat history?")){
 
-        localStorage.removeItem("chatHistory");
+        localStorage.removeItem("conversationHistory");
 
         chatBox.innerHTML = `
             <div class="message bot">

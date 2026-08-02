@@ -163,16 +163,24 @@ async function sendMessage() {
 
     const message = userInput.value.trim();
 
+    // Ignore empty messages
     if (!message) return;
 
     // Start a new conversation if the limit has been reached
     checkConversationLimit();
 
+    // Add the user's message
     addMessage("user", message);
 
+    // Clear the input
     userInput.value = "";
     userInput.style.height = "52px";
 
+    // Prevent multiple requests
+    sendBtn.disabled = true;
+    userInput.disabled = true;
+
+    // Show typing indicator
     showTyping();
 
     try {
@@ -187,42 +195,56 @@ async function sendMessage() {
             })
         });
 
-        console.log("Status:", response.status);
-
+        // Read response body
         const text = await response.text();
-        console.log("Server response:", text);
 
+        // Throw an error for non-success responses
         if (!response.ok) {
-            throw new Error(text);
+            throw new Error(
+                `HTTP ${response.status}: ${text || "Unknown server error"}`
+            );
         }
 
+        // Parse JSON
         const data = JSON.parse(text);
 
-        hideTyping();
-
-        if (data.reply) {
+        // Validate reply
+        if (data.reply && data.reply.trim()) {
 
             addMessage("bot", data.reply);
 
         } else {
 
-            addMessage("bot", "Sorry, I couldn't understand the response.");
+            addMessage(
+                "bot",
+                "Sorry, I couldn't generate a response."
+            );
 
         }
 
-    }
-    catch (error) {
+    } catch (error) {
 
-        hideTyping();
-
-        console.error(error);
+        console.error("Chat Error:", error);
 
         addMessage(
             "bot",
-            "Unable to connect to the AI server."
+            "⚠️ Unable to contact the AI server. Please try again."
         );
 
+    } finally {
+
+        // Always execute
+        hideTyping();
+
+        sendBtn.disabled = false;
+        userInput.disabled = false;
+
+        userInput.focus();
+
+        scrollToBottom();
+
     }
+
 }
 
 // ===============================

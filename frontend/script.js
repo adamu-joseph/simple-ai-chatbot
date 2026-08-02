@@ -178,7 +178,6 @@ async function sendMessage() {
 
     // Prevent multiple requests
     sendBtn.disabled = true;
-    userInput.disabled = true;
 
     // Show typing indicator
     showTyping();
@@ -237,7 +236,6 @@ async function sendMessage() {
         hideTyping();
 
         sendBtn.disabled = false;
-        userInput.disabled = false;
 
         userInput.focus();
 

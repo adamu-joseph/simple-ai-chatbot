@@ -10,6 +10,7 @@ const chatBox = document.getElementById("chatBox");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 const clearBtn = document.getElementById("clearBtn");
+
 const typingIndicator = document.getElementById("typingIndicator");
 
 // ===============================
@@ -25,13 +26,27 @@ const MAX_MESSAGES = 40;
 // Load Previous Chat
 // ===============================
 
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     const history = localStorage.getItem("conversationHistory");
 
     if (!history) return;
 
-    conversation = JSON.parse(history);
+    try {
+
+        conversation = JSON.parse(history);
+
+        if (!Array.isArray(conversation)) {
+            conversation = [];
+            saveChat();
+        }
+
+    } catch {
+
+        conversation = [];
+        saveChat();
+
+    }
 
     conversation.forEach(message => {
 
@@ -44,7 +59,7 @@ window.onload = () => {
 
     });
 
-};
+});
 
 // ===============================
 // Save Chat
@@ -161,16 +176,12 @@ function checkConversationLimit() {
 
 async function sendMessage() {
 
+    if (sendBtn.disabled) return;
+
     const message = userInput.value.trim();
 
     // Ignore empty messages
     if (!message) return;
-
-    // Start a new conversation if the limit has been reached
-    checkConversationLimit();
-
-    // Add the user's message
-    addMessage("user", message);
 
     // Clear the input
     userInput.value = "";
@@ -178,6 +189,12 @@ async function sendMessage() {
 
     // Prevent multiple requests
     sendBtn.disabled = true;
+
+    // Start a new conversation if the limit has been reached
+    checkConversationLimit();
+
+    // Add the user's message
+    addMessage("user", message);
 
     // Show typing indicator
     showTyping();
@@ -283,18 +300,15 @@ clearBtn.addEventListener("click", () => {
 
     if(confirm("Clear all chat history?")){
 
-        localStorage.removeItem("conversationHistory");
+        conversation = [];
+        saveChat();
 
-        chatBox.innerHTML = `
-            <div class="message bot">
-                <div class="avatar">🤖</div>
-                <div class="bubble">
-                    Hello! 👋<br><br>
-                    I'm your AI assistant.<br>
-                    Ask me anything.
-                </div>
-            </div>
-        `;
+        chatBox.innerHTML = "";
+
+        renderMessage(
+            "bot",
+            "Hello! 👋\n\nI'm your AI assistant.\nAsk me anything."
+        );
 
     }
 

@@ -197,50 +197,32 @@ async function sendMessage() {
         }
 
         const data = JSON.parse(text);
-    //     const response = await fetch(API_URL, {
 
-    //         method: "POST",
+        hideTyping();
 
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         },
+        if (data.reply) {
 
-    //         body: JSON.stringify({
-    //             history: conversation
-    //         })
+            addMessage("bot", data.reply);
 
-    //     });
+        } else {
 
-    //     const data = await response.json();
-    //     console.log("Response from server:", data);
+            addMessage("bot", "Sorry, I couldn't understand the response.");
 
-    //     hideTyping();
-
-    //     if (data.reply) {
-
-    //         addMessage("bot", data.reply);
-
-    //     } else {
-
-    //         addMessage("bot", "Sorry, I couldn't understand the response.");
-
-    //     }
-
-    // }
-
-    // catch (error) {
-
-    //     hideTyping();
-
-    //     addMessage(
-    //         "bot",
-    //         "Unable to connect to the AI server. Please try again later."
-    //     );
-
-    //     console.error(error);
+        }
 
     }
+    catch (error) {
 
+        hideTyping();
+
+        console.error(error);
+
+        addMessage(
+            "bot",
+            "Unable to connect to the AI server."
+        );
+
+    }
 }
 
 // ===============================

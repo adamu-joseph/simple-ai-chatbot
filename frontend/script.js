@@ -178,46 +178,66 @@ async function sendMessage() {
     try {
 
         const response = await fetch(API_URL, {
-
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify({
                 history: conversation
             })
-
         });
 
-        const data = await response.json();
-        console.log("Response from server:", data);
+        console.log("Status:", response.status);
 
-        hideTyping();
+        const text = await response.text();
+        console.log("Server response:", text);
 
-        if (data.reply) {
-
-            addMessage("bot", data.reply);
-
-        } else {
-
-            addMessage("bot", "Sorry, I couldn't understand the response.");
-
+        if (!response.ok) {
+            throw new Error(text);
         }
 
-    }
+        const data = JSON.parse(text);
+    //     const response = await fetch(API_URL, {
 
-    catch (error) {
+    //         method: "POST",
 
-        hideTyping();
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
 
-        addMessage(
-            "bot",
-            "Unable to connect to the AI server. Please try again later."
-        );
+    //         body: JSON.stringify({
+    //             history: conversation
+    //         })
 
-        console.error(error);
+    //     });
+
+    //     const data = await response.json();
+    //     console.log("Response from server:", data);
+
+    //     hideTyping();
+
+    //     if (data.reply) {
+
+    //         addMessage("bot", data.reply);
+
+    //     } else {
+
+    //         addMessage("bot", "Sorry, I couldn't understand the response.");
+
+    //     }
+
+    // }
+
+    // catch (error) {
+
+    //     hideTyping();
+
+    //     addMessage(
+    //         "bot",
+    //         "Unable to connect to the AI server. Please try again later."
+    //     );
+
+    //     console.error(error);
 
     }
 

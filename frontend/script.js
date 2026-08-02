@@ -192,6 +192,7 @@ async function sendMessage() {
         });
 
         const data = await response.json();
+        console.log("Response from server:", data);
 
         hideTyping();
 

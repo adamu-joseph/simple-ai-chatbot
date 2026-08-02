@@ -28,12 +28,12 @@ def chat():
     if not data:
         return jsonify({"error": "No JSON received."}), 400
 
+    print(data)
+
     history = data.get("history", [])
 
     if not history:
-        return jsonify({
-            "error": "Conversation history is required."
-        }), 400
+        return jsonify({"error": "Conversation history is required."}), 400
 
     try:
         reply = generate_response(history)
